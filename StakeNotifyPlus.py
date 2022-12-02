@@ -98,7 +98,10 @@ class StakeBonusCodeScraper():
                 try:
                     amount = element.get_text().split("- Value: ")[1].split("-")[0]
                 except: None
-                codes.append((prefix, code, amount))
+                try:
+                    position = "end" if "onto the end" in element.get_text() else "start"
+                except: None
+                codes.append((prefix, code, amount, position))
 
         if self.now_code[1] == codes[-1][1]:
             self.is_new_code = True
@@ -161,7 +164,10 @@ class StakeBonusCodeScraper():
                                 rightspace = leftspace + 1
                             else:
                                 rightspace = leftspace
-                            info_aa += f"={' '*leftspace}All: {self.now_code[0]+self.now_code[1]}{' '*rightspace}=\n"
+                            if self.now_code[3] == "end":
+                                info_aa += f"={' '*leftspace}All: {self.now_code[1]+self.now_code[0]}{' '*rightspace}=\n"
+                            else:
+                                info_aa += f"={' '*leftspace}All: {self.now_code[0]+self.now_code[1]}{' '*rightspace}=\n"
 
                         if self.now_code[2]:
                             valuelength = util.precisionlen("Value: "+self.now_code[2])
@@ -175,19 +181,23 @@ class StakeBonusCodeScraper():
                         info_aa += "="*36+C.RESET
 
                         print(info_aa+"\n\n")
+                        if self.now_code[3] == "end":
+                            Allcode = self.now_code[1]+self.now_code[0]
+                        else:
+                            Allcode = self.now_code[0]+self.now_code[1]
 
                         if self.Notify:
-                            notification.notify(title=self.texts["Notify"]["Title"][self.language], message=self.texts["Notify"]["Message"][self.language]+self.now_code[0]+self.now_code[1], app_name="Stake Bonus Notify", app_icon="stakeicon.ico", timeout=5)
+                            notification.notify(title=self.texts["Notify"]["Title"][self.language], message=self.texts["Notify"]["Message"][self.language]+Allcode, app_name="Stake Bonus Notify", app_icon="stakeicon.ico", timeout=5)
 
                         if self.AutoCopy:
-                            pyperclip.copy(self.now_code[0]+self.now_code[1])
+                            pyperclip.copy(Allcode)
 
                         if self.AutoOpenBrowser:
                             if self.Custome_Browser:
                                 browser = webbrowser.get(f'"{self.Custome_Browser}" %s')
-                                browser.open("https://stake.com/settings/offers")
+                                browser.open(f"https://stake.com/settings/offers?type=drop&code={Allcode}&currency=ltc&modal=redeemBonus")
                             else:
-                                webbrowser.open_new("https://stake.com/settings/offers")
+                                webbrowser.open_new(f"https://stake.com/settings/offers?type=drop&code={Allcode}&currency=ltc&modal=redeemBonus")
         except: self.mainloop()
 
     def setconfig(self):
