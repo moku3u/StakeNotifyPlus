@@ -75,9 +75,10 @@ class StakeBonusCodeScraper():
                     "ja": "ボーナスコード: ",
                     "en": "Bonus Code: "
                 }
-
             }
         }
+
+
 
     def Check_Telegram(self):
         telegram = requests.get("https://t.me/s/StakeCasino")
@@ -85,23 +86,39 @@ class StakeBonusCodeScraper():
         codes = []
 
         html = BeautifulSoup(telegram.text, "lxml")
+
         for element in html.find_all("div", class_="tgme_widget_message_text"):
-            if "25 Days of Christmas" in element.get_text() and "Monthly Bonus" not in element.get_text():
-                code = None
-                prefix = None
-                try:
-                    code = element.get_text().split("claim,")[1].split("-")[0]
-                except: None
+            texts = ""
+            for i in element:
+                if i.name in ["br", None, "b"]:
+                    if i.name == "br":
+                        texts += "\n"
+                    elif i.name == "b":
+                        texts += i.get_text()
+                    else:
+                        texts += i
+
+            if "25 Days of Christmas" in texts.splitlines()[0]:
+                for line in texts.splitlines():
+                    try:
+                        text_lines = texts.splitlines()
+                        line_number = texts.splitlines().index(line)
+                        if line != text_lines[0] or line != text_lines[-1] or line != "":
+                            print(line)
+                            if text_lines[line_number-1] == "" and text_lines[line_number+1] == "" and " " not in line:
+                                code = line
+                    except: None
                 try:
                     prefix = element.get_text().split("you must add ")[1].split(" ")[0]
-                except: None
+                except: prefix = None
                 try:
                     amount = element.get_text().split("- Value: ")[1].split("-")[0]
-                except: None
+                except: amount = None
                 try:
                     position = "end" if "onto the end" in element.get_text() else "start"
                 except: None
-                codes.append((prefix, code, amount, position))
+                if code:
+                    codes.append((prefix, code, amount, position))
 
         if self.now_code[1] == codes[-1][1]:
             self.is_new_code = True
