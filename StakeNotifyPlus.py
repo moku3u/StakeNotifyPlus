@@ -123,81 +123,82 @@ class StakeBonusCodeScraper():
                     ldng.exit = True
                     print("")
                 else:
-                    ldng.text = f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}]Code Found>>^end"
-                    time.sleep(0.5)
-                    ldng.exit = True
-                    if self.now_code[0] or self.now_code[1] or self.now_code[2]:
-                        info_aa = f"{C.MAGENTA}=============== Info ===============\n"
+                    if self.now_code[1]:
+                        ldng.text = f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}]Code Found>>^end"
+                        time.sleep(0.5)
+                        ldng.exit = True
+                        if self.now_code[0] or self.now_code[1] or self.now_code[2]:
+                            info_aa = f"{C.MAGENTA}=============== Info ===============\n"
 
-                        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                            now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-                        timelength = util.precisionlen("Time: "+now)
-                        leftspace = (34 - timelength) // 2
-                        if timelength % 2 == 1:
-                            rightspace = leftspace + 1
-                        else:
-                            rightspace = leftspace
-                        info_aa += f"={' '*leftspace}Time: {now}{' '*rightspace}=\n"
-
-                        if self.now_code[0]:
-                            prefixlength = util.precisionlen("Prefix: "+self.now_code[0])
-                            leftspace = (34 - prefixlength) // 2
-                            if prefixlength % 2 == 1:
+                            timelength = util.precisionlen("Time: "+now)
+                            leftspace = (34 - timelength) // 2
+                            if timelength % 2 == 1:
                                 rightspace = leftspace + 1
                             else:
                                 rightspace = leftspace
-                            info_aa += f"={' '*leftspace}Prefix: {self.now_code[0]}{' '*rightspace}=\n"
+                            info_aa += f"={' '*leftspace}Time: {now}{' '*rightspace}=\n"
 
-                        if self.now_code[1]:
-                            codelength = util.precisionlen("Code: "+self.now_code[1])
-                            leftspace = (34 - codelength) // 2
-                            if codelength % 2 == 1:
-                                rightspace = leftspace + 1
-                            else:
-                                rightspace = leftspace
-                            info_aa += f"={' '*leftspace}Code: {self.now_code[1]}{' '*rightspace}=\n"
+                            if self.now_code[0]:
+                                prefixlength = util.precisionlen("Prefix: "+self.now_code[0])
+                                leftspace = (34 - prefixlength) // 2
+                                if prefixlength % 2 == 1:
+                                    rightspace = leftspace + 1
+                                else:
+                                    rightspace = leftspace
+                                info_aa += f"={' '*leftspace}Prefix: {self.now_code[0]}{' '*rightspace}=\n"
 
-                        if self.now_code[1] and self.now_code[0]:
-                            codelength = util.precisionlen("All: "+self.now_code[0]+self.now_code[1])
-                            leftspace = (34 - codelength) // 2
-                            if codelength % 2 == 1:
-                                rightspace = leftspace + 1
-                            else:
-                                rightspace = leftspace
+                            if self.now_code[1]:
+                                codelength = util.precisionlen("Code: "+self.now_code[1])
+                                leftspace = (34 - codelength) // 2
+                                if codelength % 2 == 1:
+                                    rightspace = leftspace + 1
+                                else:
+                                    rightspace = leftspace
+                                info_aa += f"={' '*leftspace}Code: {self.now_code[1]}{' '*rightspace}=\n"
+
+                            if self.now_code[1] and self.now_code[0]:
+                                codelength = util.precisionlen("All: "+self.now_code[0]+self.now_code[1])
+                                leftspace = (34 - codelength) // 2
+                                if codelength % 2 == 1:
+                                    rightspace = leftspace + 1
+                                else:
+                                    rightspace = leftspace
+                                if self.now_code[3] == "end":
+                                    info_aa += f"={' '*leftspace}All: {self.now_code[1]+self.now_code[0]}{' '*rightspace}=\n"
+                                else:
+                                    info_aa += f"={' '*leftspace}All: {self.now_code[0]+self.now_code[1]}{' '*rightspace}=\n"
+
+                            if self.now_code[2]:
+                                valuelength = util.precisionlen("Value: "+self.now_code[2])
+                                leftspace = (34 - valuelength) // 2
+                                if valuelength % 2 == 1:
+                                    rightspace = leftspace + 1
+                                else:
+                                    rightspace = leftspace
+                                info_aa += f"={' '*leftspace}Value: {self.now_code[2]}{' '*rightspace}=\n"
+
+                            info_aa += "="*36+C.RESET
+
+                            print(info_aa+"\n\n")
                             if self.now_code[3] == "end":
-                                info_aa += f"={' '*leftspace}All: {self.now_code[1]+self.now_code[0]}{' '*rightspace}=\n"
+                                Allcode = self.now_code[1]+self.now_code[0]
                             else:
-                                info_aa += f"={' '*leftspace}All: {self.now_code[0]+self.now_code[1]}{' '*rightspace}=\n"
+                                Allcode = self.now_code[0]+self.now_code[1]
 
-                        if self.now_code[2]:
-                            valuelength = util.precisionlen("Value: "+self.now_code[2])
-                            leftspace = (34 - valuelength) // 2
-                            if valuelength % 2 == 1:
-                                rightspace = leftspace + 1
-                            else:
-                                rightspace = leftspace
-                            info_aa += f"={' '*leftspace}Value: {self.now_code[2]}{' '*rightspace}=\n"
+                            if self.Notify:
+                                notification.notify(title=self.texts["Notify"]["Title"][self.language], message=self.texts["Notify"]["Message"][self.language]+Allcode, app_name="Stake Bonus Notify", app_icon="stakeicon.ico", timeout=5)
 
-                        info_aa += "="*36+C.RESET
+                            if self.AutoCopy:
+                                pyperclip.copy(Allcode)
 
-                        print(info_aa+"\n\n")
-                        if self.now_code[3] == "end":
-                            Allcode = self.now_code[1]+self.now_code[0]
-                        else:
-                            Allcode = self.now_code[0]+self.now_code[1]
-
-                        if self.Notify:
-                            notification.notify(title=self.texts["Notify"]["Title"][self.language], message=self.texts["Notify"]["Message"][self.language]+Allcode, app_name="Stake Bonus Notify", app_icon="stakeicon.ico", timeout=5)
-
-                        if self.AutoCopy:
-                            pyperclip.copy(Allcode)
-
-                        if self.AutoOpenBrowser:
-                            if self.Custome_Browser:
-                                browser = webbrowser.get(f'"{self.Custome_Browser}" %s')
-                                browser.open(f"https://stake.com/settings/offers?type=drop&code={Allcode}&currency=ltc&modal=redeemBonus")
-                            else:
-                                webbrowser.open_new(f"https://stake.com/settings/offers?type=drop&code={Allcode}&currency=ltc&modal=redeemBonus")
+                            if self.AutoOpenBrowser:
+                                if self.Custome_Browser:
+                                    browser = webbrowser.get(f'"{self.Custome_Browser}" %s')
+                                    browser.open(f"https://stake.com/settings/offers?type=drop&code={Allcode}&currency=ltc&modal=redeemBonus")
+                                else:
+                                    webbrowser.open_new(f"https://stake.com/settings/offers?type=drop&code={Allcode}&currency=ltc&modal=redeemBonus")
         except: self.mainloop()
 
     def setconfig(self):
